@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<faces-config version="2.0"
+    xmlns="http://java.sun.com/xml/ns/javaee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd">
+
+    <name>ext202patch-ovh</name>
+    <ordering>
+        <before>
+            <others/>
+        </before>
+    </ordering>
+    
+    <application>
+        <view-handler>org.apache.myfaces.ext202patch.application.ViewHandlerImpl</view-handler>
+        <state-manager>org.apache.myfaces.ext202patch.application.StateManagerImpl</state-manager>
+    </application>
+    
+    <render-kit>
+        <render-kit-id>HTML_BASIC</render-kit-id>
+        <render-kit-class>org.apache.myfaces.ext202patch.override.RenderKitWrapperImpl</render-kit-class>
+    </render-kit>
+    
+</faces-config>

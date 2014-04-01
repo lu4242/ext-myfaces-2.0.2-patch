@@ -1,0 +1,201 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
+-->
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.myfaces.shared</groupId>
+    <artifactId>myfaces-shared-project</artifactId>
+    <version>4.0.20</version>
+  </parent>
+
+  <groupId>org.apache.myfaces.ext202patch</groupId>
+  <artifactId>myfaces-shared-ext202patch</artifactId>
+  <version>2.0.21</version>
+  <packaging>jar</packaging>
+  <name>Ext202-MyFaces Shared Extension 202 patch</name>
+  <description>Ext202-MyFaces Shared Extension 202 patch.</description>
+
+  <build>
+
+    <resources>
+        <resource>
+          <!-- because adding an additional resourceRoot not possible with antrun yet -->
+          <directory>target/refactored-shared-sources/main/resources</directory>
+        </resource>
+    </resources>
+
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          <execution>
+            <id>add-source-shared</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/refactored-shared-sources/main/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-sources</id>
+            <phase>generate-sources</phase>
+            <goals><goal>unpack</goal></goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                   <groupId>org.apache.myfaces.core.internal</groupId>
+                   <artifactId>myfaces-impl-shared</artifactId>
+                   <version>2.0.21</version>
+                   <type>jar</type>
+                   <classifier>sources</classifier>
+                   <excludes>org/apache/myfaces/shared/util/StateUtils.java</excludes>
+                 </artifactItem>
+               </artifactItems>
+               <outputDirectory>${project.build.directory}/unpacked-shared-sources</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Unpack resources to be added in source jar -->
+            <id>unpack-resources-sources</id>
+            <phase>generate-sources</phase>
+            <goals><goal>unpack</goal></goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                   <groupId>org.apache.myfaces.core.internal</groupId>
+                   <artifactId>myfaces-impl-shared</artifactId>
+                   <version>2.0.21</version>
+                   <type>jar</type>
+                 </artifactItem>
+               </artifactItems>
+               <includes>META-INF/internal-resources/**,META-INF/resources/**</includes>
+               <outputDirectory>${project.build.directory}/refactored-shared-sources/main/resources</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Unpack resources to be added in jar -->
+            <id>unpack-resources</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.apache.myfaces.core.internal</groupId>
+                  <artifactId>myfaces-impl-shared</artifactId>
+                  <version>2.0.21</version>
+                  <type>jar</type>
+                </artifactItem>
+              </artifactItems>
+              <!-- Just include the .class files in org/** and the META-INF/services directory -->
+              <!-- <includes>org/**,META-INF/services/**</includes> -->
+              <includes>META-INF/internal-resources/**,META-INF/resources/**</includes>
+              <outputDirectory>${project.build.directory}/classes</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>refactor-shared-sources</id>
+            <phase>process-sources</phase>
+            <configuration>
+              <tasks>
+                  <property name="refactor.src.dir" value="${project.build.directory}/unpacked-shared-sources" />
+                  <property name="refactor.output.dir" value="${project.build.directory}/refactored-shared-sources/main/java" />
+                  <property name="refactor.package.new" value="shared_ext202patch" />
+                  <ant dir="${project.basedir}" antfile="build.xml" inheritRefs="true" inheritAll="true">
+                    <target name="refactor-java-sources" />
+                  </ant>
+              </tasks>
+              <sourceRoot>${project.build.directory}/refactored-shared-sources/main/java</sourceRoot>
+            </configuration>
+            <goals><goal>run</goal></goals>
+          </execution>
+          <execution>
+            <id>refactor-resources</id>
+            <phase>generate-resources</phase>
+            <configuration>
+              <tasks>
+                  <property name="refactor.src.dir" value="${project.build.directory}/unpacked-shared-sources" />
+                  <property name="refactor.output.dir" value="${project.build.directory}/refactored-shared-sources/main/resources" />
+                  <property name="refactor.package.new" value="shared_ext202patch" />
+                  <ant dir="${project.basedir}" antfile="build.xml" inheritRefs="true" inheritAll="true">
+                    <target name="refactor-resources" />
+                  </ant>
+              </tasks>
+              <resourceRoot>${project.build.directory}/refactored-shared-sources/main/resources</resourceRoot> <!-- not yet supported -->
+            </configuration>
+            <goals><goal>run</goal></goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-source</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+
+  </build>
+
+  <dependencies>
+    <dependency>
+	  <groupId>org.apache.myfaces.core.internal</groupId>
+	  <artifactId>myfaces-impl-shared</artifactId>
+	  <version>2.0.21</version>	
+      <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+	  <groupId>org.apache.myfaces.core</groupId>
+	  <artifactId>myfaces-impl</artifactId>
+	  <version>2.0.2</version>	
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+
+</project>
