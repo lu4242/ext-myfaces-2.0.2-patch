@@ -4,7 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd">
 
-    <name>ext202patch-ovh</name>
+    <name>ext202patch_ovh</name>
     <ordering>
         <before>
             <others/>
@@ -15,6 +15,10 @@
         <view-handler>org.apache.myfaces.ext202patch.application.ViewHandlerImpl</view-handler>
         <state-manager>org.apache.myfaces.ext202patch.application.StateManagerImpl</state-manager>
     </application>
+    
+    <factory>
+        <view-declaration-language-factory>org.apache.myfaces.ext202patch.override.ViewDeclarationLanguageFixedFactory</view-declaration-language-factory>
+    </factory>
     
     <render-kit>
         <render-kit-id>HTML_BASIC</render-kit-id>
